@@ -27,8 +27,8 @@ struct MetricsContent: View {
                             heroSection
                             metricsSection
                             HStack(alignment: .top, spacing: 18) {
-                                HelpAndResourcesSection()
-                                DashboardPromotionsSection(licenseState: licenseState)
+                                TipJarSection()
+                                InstagramProjectsSection()
                             }
 
                             Spacer(minLength: 20)

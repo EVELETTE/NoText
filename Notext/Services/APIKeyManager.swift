@@ -23,7 +23,8 @@ final class APIKeyManager {
         "speechmatics": "speechmaticsAPIKey",
         "openai": "openAIAPIKey",
         "anthropic": "anthropicAPIKey",
-        "openrouter": "openRouterAPIKey"
+        "openrouter": "openRouterAPIKey",
+        "qwen": "qwenAPIKey"
     ]
 
     /// Legacy UserDefaults to Keychain key mapping for migration.
@@ -38,7 +39,8 @@ final class APIKeyManager {
         "SpeechmaticsAPIKey": "speechmaticsAPIKey",
         "OpenAIAPIKey": "openAIAPIKey",
         "AnthropicAPIKey": "anthropicAPIKey",
-        "OpenRouterAPIKey": "openRouterAPIKey"
+        "OpenRouterAPIKey": "openRouterAPIKey",
+        "QwenAPIKey": "qwenAPIKey"
     ]
 
     private init() {
@@ -212,6 +214,8 @@ final class APIKeyManager {
             return "AnthropicAPIKey"
         case "openrouter":
             return "OpenRouterAPIKey"
+        case "qwen":
+            return "QwenAPIKey"
         default:
             return "\(provider)APIKey"
         }

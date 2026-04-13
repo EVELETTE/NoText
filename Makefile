@@ -4,7 +4,7 @@ WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
 
-.PHONY: all clean whisper setup build local check healthcheck help dev run
+.PHONY: all clean whisper setup build local check healthcheck help dev run release dist
 
 # Default target
 all: check build
@@ -76,6 +76,63 @@ local: check setup
 		exit 1; \
 	fi
 
+# Build and package for distribution (pre-compiled app for users)
+release: check setup
+	@echo "📦 Building Notext for distribution..."
+	@rm -rf "$(LOCAL_DERIVED_DATA)"
+	xcodebuild -project Notext.xcodeproj -scheme Notext -configuration Release \
+		-derivedDataPath "$(LOCAL_DERIVED_DATA)" \
+		-xcconfig LocalBuild.xcconfig \
+		CODE_SIGN_IDENTITY="-" \
+		CODE_SIGNING_REQUIRED=NO \
+		CODE_SIGNING_ALLOWED=YES \
+		DEVELOPMENT_TEAM="" \
+		CODE_SIGN_ENTITLEMENTS=$(CURDIR)/Notext/Notext.entitlements \
+		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
+		build
+	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/Notext.app" && \
+	if [ -d "$$APP_PATH" ]; then \
+		VERSION=$$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$$APP_PATH/Contents/Info.plist"); \
+		BUILD=$$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$$APP_PATH/Contents/Info.plist"); \
+		echo ""; \
+		echo "✅ Build complete: Notext v$$VERSION ($$BUILD)"; \
+		echo ""; \
+		echo "📁 App location: $$APP_PATH"; \
+		echo ""; \
+		echo "📦 Creating distribution packages..."; \
+		OUTPUT_DIR="$(CURDIR)/dist"; \
+		mkdir -p "$$OUTPUT_DIR"; \
+		ZIP_PATH="$$OUTPUT_DIR/Notext.zip"; \
+		DMG_PATH="$$OUTPUT_DIR/Notext.dmg"; \
+		rm -f "$$ZIP_PATH" "$$DMG_PATH"; \
+		ditto -c -k --keepParent "$$APP_PATH" "$$ZIP_PATH"; \
+		echo "✅ ZIP created: $$ZIP_PATH"; \
+		hdiutil create -volname "Notext" -srcfolder "$$APP_PATH" -ov "$$DMG_PATH" -format UDZO; \
+		echo "✅ DMG created: $$DMG_PATH"; \
+		xattr -cr "$$APP_PATH"; \
+		echo ""; \
+		echo "🎉 Distribution packages ready!"; \
+		echo ""; \
+		echo "📂 Files in $$OUTPUT_DIR:"; \
+		ls -lh "$$OUTPUT_DIR"; \
+		echo ""; \
+		echo "📤 For GitHub Release:"; \
+		echo "   gh release create v$$VERSION --title \"Notext v$$VERSION\" --generate-notes"; \
+		echo "   gh release upload v$$VERSION $$ZIP_PATH $$DMG_PATH"; \
+		echo ""; \
+		echo "👤 Users can now:"; \
+		echo "   - Download Notext.zip or Notext.dmg from GitHub Releases"; \
+		echo "   - Drag Notext.app to their Applications folder"; \
+		echo "   - Open the app (first time: System Settings > Privacy & Security > Open Anyway)"; \
+		echo ""; \
+	else \
+		echo "❌ Error: Could not find built Notext.app at $$APP_PATH"; \
+		exit 1; \
+	fi
+
+# Alias for release
+dist: release
+
 # Run application
 run:
 	@if [ -d "$$HOME/Downloads/Notext.app" ]; then \
@@ -109,6 +166,8 @@ help:
 	@echo "  local              Build for local use (no Apple Developer certificate needed)"
 	@echo "  run                Launch the built VoiceInk app"
 	@echo "  dev                Build and run the app (for development)"
+	@echo "  release/dist       Build and package for distribution (ZIP + DMG)"
+	@echo "  publish            Sign and publish update via Sparkle"
 	@echo "  all                Run full build process (default)"
 	@echo "  clean              Remove build artifacts"
 	@echo "  help               Show this help message"

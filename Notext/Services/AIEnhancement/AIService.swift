@@ -9,6 +9,7 @@ enum AIProvider: String, CaseIterable {
     case openAI = "OpenAI"
     case openRouter = "OpenRouter"
     case mistral = "Mistral"
+    case qwen = "Qwen"
     case elevenLabs = "ElevenLabs"
     case deepgram = "Deepgram"
     case soniox = "Soniox"
@@ -34,6 +35,13 @@ enum AIProvider: String, CaseIterable {
             return "https://openrouter.ai/api/v1/chat/completions"
         case .mistral:
             return "https://api.mistral.ai/v1/chat/completions"
+        case .qwen:
+            let region = UserDefaults.standard.string(forKey: "qwenRegion") ?? "international"
+            if region == "china" {
+                return "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+            } else {
+                return "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions"
+            }
         case .elevenLabs:
             return "https://api.elevenlabs.io/v1/speech-to-text"
         case .deepgram:
@@ -65,6 +73,8 @@ enum AIProvider: String, CaseIterable {
             return "gpt-5.4"
         case .mistral:
             return "mistral-large-latest"
+        case .qwen:
+            return "qwen-max"
         case .elevenLabs:
             return "scribe_v1"
         case .deepgram:
@@ -136,6 +146,15 @@ enum AIProvider: String, CaseIterable {
                 "mistral-large-latest",
                 "mistral-medium-latest",
                 "mistral-small-latest"
+            ]
+        case .qwen:
+            return [
+                "qwen-max",
+                "qwen-plus",
+                "qwen-turbo",
+                "qwen-long",
+                "qwen-vl-max",
+                "qwen-vl-plus"
             ]
         case .elevenLabs:
             return ["scribe_v1", "scribe_v1_experimental"]
@@ -470,6 +489,19 @@ class AIService: ObservableObject {
                 self.saveOpenRouterModels()
                 self.objectWillChange.send()
             }
+        }
+    }
+
+    // MARK: - Qwen Region Configuration
+
+    var qwenRegion: String {
+        get {
+            UserDefaults.standard.string(forKey: "qwenRegion") ?? "international"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "qwenRegion")
+            objectWillChange.send()
+            NotificationCenter.default.post(name: .AppSettingsDidChange, object: nil)
         }
     }
 }

@@ -75,38 +75,39 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $selectedView) {
-                Section {
-                    // App Header
-                    HStack(spacing: 6) {
-                        if let appIcon = NSImage(named: "AppIcon") {
-                            Image(nsImage: appIcon)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 28, height: 28)
-                                .cornerRadius(8)
+            ZStack(alignment: .bottomLeading) {
+                List(selection: $selectedView) {
+                    ForEach(visibleViewTypes) { viewType in
+                        Section {
+                            NavigationLink(value: viewType) {
+                                SidebarItemView(viewType: viewType)
+                            }
+                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .listRowSeparator(.hidden)
                         }
-
-                        Text("Notext")
-                            .font(.system(size: 14, weight: .semibold))
-
-                        Spacer()
-                    }
-                    .padding(.vertical, 4)
-                }
-
-                ForEach(visibleViewTypes) { viewType in
-                    Section {
-                        NavigationLink(value: viewType) {
-                            SidebarItemView(viewType: viewType)
-                        }
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                        .listRowSeparator(.hidden)
                     }
                 }
+                .listStyle(.sidebar)
+
+                // App Footer (logo + name at very bottom-left)
+                HStack(spacing: 6) {
+                    if let appIcon = NSImage(named: "AppIcon") {
+                        Image(nsImage: appIcon)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 24, height: 24)
+                            .cornerRadius(6)
+                    }
+
+                    Text("Notext")
+                        .font(.system(size: 13, weight: .semibold))
+
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color(nsColor: .controlBackgroundColor))
             }
-            .listStyle(.sidebar)
-            .navigationTitle("Notext")
             .navigationSplitViewColumnWidth(210)
         } detail: {
             if let selectedView = selectedView {

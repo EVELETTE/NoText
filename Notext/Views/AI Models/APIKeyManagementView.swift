@@ -221,6 +221,76 @@ struct APIKeyManagementView: View {
                             .foregroundColor(.orange)
                     }
 
+                } else if aiService.selectedProvider == .qwen {
+                    Picker("Region", selection: Binding(
+                        get: { aiService.qwenRegion },
+                        set: { aiService.qwenRegion = $0 }
+                    )) {
+                        Text("International").tag("international")
+                        Text("China").tag("china")
+                    }
+                    .onChange(of: aiService.qwenRegion) { _, _ in
+                        // Re-verify API key when region changes
+                        if aiService.isAPIKeyValid {
+                            aiService.clearAPIKey()
+                        }
+                    }
+
+                    Divider()
+
+                    if aiService.isAPIKeyValid {
+                        HStack {
+                            Text("API Key")
+                            Spacer()
+                            Text("••••••••")
+                                .foregroundColor(.secondary)
+                            Button("Remove", role: .destructive) {
+                                aiService.clearAPIKey()
+                            }
+                        }
+                    } else {
+                        SecureField("API Key", text: $apiKey)
+                            .textFieldStyle(.roundedBorder)
+
+                        HStack {
+                            Link(destination: URL(string: "https://bailian.console.aliyun.com/")!) {
+                                HStack {
+                                    Image(systemName: "key.fill")
+                                    Text("Get API Key")
+                                }
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(6)
+                            }
+                            .buttonStyle(.plain)
+
+                            Spacer()
+
+                            Button(action: {
+                                isVerifying = true
+                                aiService.saveAPIKey(apiKey) { success, errorMessage in
+                                    isVerifying = false
+                                    if !success {
+                                        alertMessage = errorMessage ?? "Verification failed"
+                                        showAlert = true
+                                    }
+                                    apiKey = ""
+                                }
+                            }) {
+                                HStack {
+                                    if isVerifying {
+                                        ProgressView().controlSize(.small)
+                                    }
+                                    Text("Verify and Save")
+                                }
+                            }
+                            .disabled(apiKey.isEmpty)
+                        }
+                    }
+
                 } else if aiService.selectedProvider == .custom {
                     TextField("API Endpoint URL", text: $aiService.customBaseURL, prompt: Text("e.g. https://api.openai.com/v1/chat/completions"))
                         .textFieldStyle(.roundedBorder)
@@ -370,6 +440,7 @@ struct APIKeyManagementView: View {
         case .speechmatics: return URL(string: "https://portal.speechmatics.com/manage-access/")
         case .openRouter: return URL(string: "https://openrouter.ai/keys")
         case .cerebras: return URL(string: "https://cloud.cerebras.ai/")
+        case .qwen: return URL(string: "https://bailian.console.aliyun.com/")
         default: return nil
         }
     }

@@ -99,6 +99,27 @@ enum PromptTemplates {
                     """,
                 icon: "pencil.circle.fill",
                 description: "Rewrites with better clarity."
+            ),
+            TemplatePrompt(
+                id: UUID(),
+                title: "Code & Vibe Coding",
+                promptText: """
+                    - Transform the <TRANSCRIPT> text into clean, production-ready code or technical specifications.
+                    - When the transcript describes code, algorithms, or logic: output properly formatted code in the appropriate language (detect from context). Use modern best practices, clean naming conventions, and include concise comments only where necessary.
+                    - When the transcript describes features, requirements, or functionality: output structured technical specs with clear sections: Overview, Requirements, Architecture/Logic, and Edge Cases. Use bullet points and numbered lists appropriately.
+                    - Preserve ALL technical terms, variable names, function names, API endpoints, and code snippets exactly as spoken. Do NOT "correct" code syntax unless it's obviously a transcription error (e.g., "open parentheses" → "(").
+                    - Convert spoken programming phrases to proper syntax: "function" → "function/def/fn" based on detected language, "equals" → "=", "triple equals" → "===", "arrow function" → "=>", "dot" → ".", "underscore" → "_", etc.
+                    - Structure code blocks with proper indentation, spacing, and formatting conventions of the target language.
+                    - For architecture/system design descriptions: use clear hierarchical structure with components, relationships, and data flow.
+                    - Keep inline technical explanations concise and focused on the "why", not the "what".
+                    - When pseudocode is described, output clean pseudocode that follows common programming conventions.
+                    - Do NOT add placeholder implementations, TODO comments, or "fill this in" notes unless explicitly requested in the transcript.
+                    - Do not add explanations, labels, metadata, or instructions.
+                    - Output only the code or technical specifications.
+                    - Don't add any information not available in the <TRANSCRIPT> text ever.
+                    """,
+                icon: "terminal.fill",
+                description: "Transforms speech into clean code and technical specifications for vibe coding"
             )
         ]
     }
