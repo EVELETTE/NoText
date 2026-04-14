@@ -7,13 +7,13 @@
     <language>en</language>
     <item>
       <title>Version 2.13</title>
-      <pubDate>2026-04-13T23:27:22Z</pubDate>
+      <pubDate>2026-04-14T00:30:40Z</pubDate>
       <sparkle:version>213</sparkle:version>
       <sparkle:shortVersionString>2.13</sparkle:shortVersionString>
       <enclosure
           url="https://github.com/EVELETTE/Notext/releases/download/v2.13/Notext.zip"
-          sparkle:edSignature="rNrc7IyvCw7aut4Ipm4rTVhguc9AmIWGFmKpYLIK0UJjxKhKq6Ifi7nVhrd9xDQiHcnOtFDqnY4/odUnwKMTCQ=="
-          length="11534368"
+          sparkle:edSignature="LwOPiwvvqvH+BQOIKgxJJHc78BTC2Q6D9uazFyP0jOlELrxfPUPQpvXfQLpH20UGdjlY1UhC+y77rN+e7LePAQ=="
+          length="11534369"
           type="application/octet-stream"
       />
     </item>
